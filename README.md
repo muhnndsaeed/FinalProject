@@ -3,9 +3,11 @@
 # **Project Name: Fitness and Health Consultation System** 
 
 **Idea:**
+
 It is an application related to fitness and health and the creation of blogs and consultations regarding sports and health
 
 **Inspiration:**
+
 Urging those interested in fitness and health to present their experiences, as well as helping the trainees to offer their consultations
 
 **User Stories**
