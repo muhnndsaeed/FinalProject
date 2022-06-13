@@ -6,7 +6,7 @@ from rest_framework import status
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from .models import Blog
+from .models import Blog , Comment
 from .serializers import BlogSerializer
 # Create your views here.
 
@@ -30,7 +30,7 @@ def add_blog(request : Request):
         return Response(dataResponse)
     else:
         print(new_blog.errors)
-        dataResponse = {"msg" : "couldn't create a city"}
+        dataResponse = {"msg" : "couldn't create a blog"}
         return Response( dataResponse, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -78,6 +78,76 @@ def delete_blog(request: Request, blog_id):
     blog.delete()
     return Response({"msg" : "Deleted Successfully"})
 
+
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+def add_comment(request : Request):
+
+    if not request.user.is_authenticated:
+        return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    print(request.user.is_staff)
+
+
+    new_comment = CommentSerializer(data=request.data)
+    if new_comment.is_valid():
+        new_comment.save()
+        dataResponse = {
+            "msg" : "Created Successfully",
+            "comment" : new_comment.data
+        }
+        return Response(dataResponse)
+    else:
+        print(new_comment.errors)
+        dataResponse = {"msg" : "couldn't create a comment"}
+        return Response( dataResponse, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def list_comment(request : Request):
+    blogs = Comment.objects.all()
+
+    dataResponse = {
+        "msg" : "List of All comments",
+        "comments" : BlogSerializer(instance=blogs, many=True).data
+    }
+
+    return Response(dataResponse)
+
+
+
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def update_comment(request : Request, comment_id):
+    blog = Comment.objects.get(id=comment_id)
+
+    updated_comment = BlogSerializer(instance=blog, data=request.data)
+    if updated_comment.is_valid():
+        updated_comment.save()
+        responseData = {
+            "msg" : "updated successefully"
+        }
+
+        return Response(responseData)
+    else:
+        print(updated_comment.errors)
+        return Response({"msg" : "bad request, cannot update"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+def delete_comment(request: Request, comment_id):
+    comment = Comment.objects.get(id=comment_id)
+    comment.delete()
+    return Response({"msg" : "Deleted Successfully"})
 
 
 
