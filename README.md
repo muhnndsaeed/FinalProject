@@ -6,7 +6,7 @@
 
 **Idea:**
 
-It is an application related to fitness and health and the creation of blogs and consultations regarding sports and health
+It is an application related to fitness and health and the creation of blogs and consultations regarding fitness and health
 
 
 ------------
