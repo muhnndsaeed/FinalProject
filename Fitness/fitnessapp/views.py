@@ -1,38 +1,113 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from .models import Blog , Comment
-from .serializers import BlogSerializer
+from .models import Blog , Comment , Consultation , Profile ,ConComment
+from .serializers import BlogSerializer , ConsultationSerializer , CommentSerializer ,ProfileSerializer,ConCommentSerializer
 # Create your views here.
+
+'''
+ we use permission To verify the identity of the user
+ 
+'''
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def add_profile(request: Request):
+    if not request.user.is_authenticated or not request.user.has_perm('fitnessapp.add_profile'):
+        return Response("Not Allowed", status=status.HTTP_400_BAD_REQUEST)
+
+
+    request.data["user"] = request.user.id
+
+    new_profile = ProfileSerializer(data=request.data)
+    if new_profile.is_valid():
+        new_profile.save()
+        dataResponse = {
+            "msg": "Thank you for record Your Profile...",
+            "Certification ": new_profile.data
+        }
+        return Response(dataResponse)
+    else:
+        print(new_profile.errors)
+        dataResponse = {"msg": "Sorry, couldn't add new Profile"}
+        return Response(dataResponse, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def list_profile(request : Request):
+    profile = Profile.objects.all()
+
+    dataResponse = {
+        "msg" : "List of All profiles",
+        "profile": ProfileSerializer(instance=profile, many=True).data
+    }
+
+    return Response(dataResponse)
+
+
+
+
+
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def update_profile(request : Request, profile_id):
+    profile = Profile.objects.get(id=profile_id)
+
+    updated_profile = ProfileSerializer(instance=profile, data=request.data)
+    if updated_profile.is_valid():
+        updated_profile.save()
+        responseData = {
+            "msg" : "updated successefully"
+        }
+
+        return Response(responseData)
+    else:
+        print(updated_profile.errors)
+        return Response({"msg" : "bad request, cannot update"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+def delete_profile(request: Request, profile_id):
+    profile = Profile.objects.get(id=profile_id)
+    profile.delete()
+    return Response({"msg" : "Deleted Successfully"})
+
+
+
+
+'''
+Here you check if the user can create blog
+If he has the permissions, the blog will be created
+'''
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-def add_blog(request : Request):
+@permission_classes([IsAuthenticated])
+def add_blog(request: Request):
+    if not request.user.is_authenticated or not request.user.has_perm('fitnessapp.add_blog'):
+        return Response("Not Allowed", status=status.HTTP_400_BAD_REQUEST)
 
-    if not request.user.is_authenticated:
-        return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    print(request.user.is_staff)
-
+    request.data["user"] = request.user.id
 
     new_blog = BlogSerializer(data=request.data)
     if new_blog.is_valid():
         new_blog.save()
-        dataResponse = {
-            "msg" : "Created Successfully",
-            "blog" : new_blog.data
-        }
-        return Response(dataResponse)
+        return Response({"Blog": new_blog.data})
     else:
         print(new_blog.errors)
-        dataResponse = {"msg" : "couldn't create a blog"}
-        return Response( dataResponse, status=status.HTTP_400_BAD_REQUEST)
 
+    return Response("no", status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -81,28 +156,95 @@ def delete_blog(request: Request, blog_id):
 
 
 
+
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
-def add_comment(request : Request):
+@permission_classes([IsAuthenticated])
+def add_consultation(request: Request):
+    if not request.user.is_authenticated or not request.user.has_perm('fitnessapp.add_consultation'):
+        return Response("Not Allowed", status=status.HTTP_400_BAD_REQUEST)
 
-    if not request.user.is_authenticated:
-        return Response({"msg" : "Not Allowed"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    print(request.user.is_staff)
+    request.data["user"] = request.user.id
 
+    new_consultation = ConsultationSerializer(data=request.data)
+    if new_consultation.is_valid():
+        new_consultation.save()
+        return Response({"Consultation": new_consultation.data})
+    else:
+        print(new_consultation.errors)
+
+    return Response("no", status=status.HTTP_400_BAD_REQUEST)
+
+
+
+'''
+All consultations will be shown
+'''
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def list_consultations(request : Request):
+    consultation = Consultation.objects.all()
+
+    dataResponse = {
+        "msg" : "List of All consultations",
+        "consultation": ConsultationSerializer(instance=consultation, many=True).data
+    }
+
+    return Response(dataResponse)
+
+
+
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def update_consultation(request : Request, consultation_id):
+    consultation = Consultation.objects.get(id=consultation_id)
+
+    updated_consultation = ConsultationSerializer(instance=consultation, data=request.data)
+    if updated_consultation.is_valid():
+        updated_consultation.save()
+        responseData = {
+            "msg" : "updated successefully"
+        }
+
+        return Response(responseData)
+    else:
+        print(updated_consultation.errors)
+        return Response({"msg" : "bad request, cannot update"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+def delete_consultation(request: Request, consultation_id):
+    consultation = Consultation.objects.get(id=consultation_id)
+    consultation.delete()
+    return Response({"msg" : "Deleted Successfully"})
+
+
+
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def add_comment(request: Request):
+    if not request.user.is_authenticated or not request.user.has_perm('fitnessapp.add_comment'):
+        return Response("Not Allowed", status=status.HTTP_400_BAD_REQUEST)
+
+
+    request.data["user"] = request.user.id
 
     new_comment = CommentSerializer(data=request.data)
     if new_comment.is_valid():
         new_comment.save()
-        dataResponse = {
-            "msg" : "Created Successfully",
-            "comment" : new_comment.data
-        }
-        return Response(dataResponse)
+        return Response({"Comment": new_comment.data})
     else:
         print(new_comment.errors)
-        dataResponse = {"msg" : "couldn't create a comment"}
-        return Response( dataResponse, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response("no", status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
@@ -111,11 +253,11 @@ def add_comment(request : Request):
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 def list_comment(request : Request):
-    blogs = Comment.objects.all()
+    comments = Comment.objects.all()
 
     dataResponse = {
         "msg" : "List of All comments",
-        "comments" : BlogSerializer(instance=blogs, many=True).data
+        "comments" : CommentSerializer(instance=comments, many=True).data
     }
 
     return Response(dataResponse)
@@ -125,9 +267,9 @@ def list_comment(request : Request):
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 def update_comment(request : Request, comment_id):
-    blog = Comment.objects.get(id=comment_id)
+    comment = Comment.objects.get(id=comment_id)
 
-    updated_comment = BlogSerializer(instance=blog, data=request.data)
+    updated_comment = CommentSerializer(instance=comment, data=request.data)
     if updated_comment.is_valid():
         updated_comment.save()
         responseData = {
@@ -150,4 +292,68 @@ def delete_comment(request: Request, comment_id):
     return Response({"msg" : "Deleted Successfully"})
 
 
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def add_concomment(request: Request):
+    if not request.user.is_authenticated or not request.user.has_perm('fitnessapp.add_concomment'):
+        return Response("Not Allowed", status=status.HTTP_400_BAD_REQUEST)
+
+
+    request.data["user"] = request.user.id
+
+    new_comment = ConCommentSerializer(data=request.data)
+    if new_comment.is_valid():
+        new_comment.save()
+        return Response({"Comment": new_comment.data})
+    else:
+        print(new_comment.errors)
+
+    return Response("no", status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def list_concomment(request : Request):
+    comments = ConComment.objects.all()
+
+    dataResponse = {
+        "msg" : "List of All comments",
+        "comments" : ConCommentSerializer(instance=comments, many=True).data
+    }
+
+    return Response(dataResponse)
+
+
+
+@api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
+def update_concomment(request : Request, comment_id):
+    comment = ConComment.objects.get(id=comment_id)
+
+    updated_comment = ConCommentSerializer(instance=comment, data=request.data)
+    if updated_comment.is_valid():
+        updated_comment.save()
+        responseData = {
+            "msg" : "updated successefully"
+        }
+
+        return Response(responseData)
+    else:
+        print(updated_comment.errors)
+        return Response({"msg" : "bad request, cannot update"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+def delete_concomment(request: Request, comment_id):
+    comment = ConComment.objects.get(id=comment_id)
+    comment.delete()
+    return Response({"msg" : "Deleted Successfully"})
 
