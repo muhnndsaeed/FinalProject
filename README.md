@@ -43,6 +43,9 @@ Urging those interested in fitness and health to present their experiences, as w
 
 **Trainees**
 - Can add a Consulation
+-  View a Consultation
+- Can add a comments of blogs and Consultations
+
 
 
 
