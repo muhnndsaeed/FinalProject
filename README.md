@@ -6,7 +6,7 @@
 
 **Idea:**
 
-It is an application related to fitness and health and the creation of blogs and consultations regarding sports and health
+It is an application related to fitness and health and the creation of blogs and consultations regarding fitness and health
 
 
 ------------
@@ -43,7 +43,12 @@ Urging those interested in fitness and health to present their experiences, as w
 
 **Trainees**
 - Can add a Consulation
+-  View a Consultation
+- Can add a comments of blogs 
 
 
+# horoku link
+
+https://sleepy-lake-91266.herokuapp.com/
 
 
