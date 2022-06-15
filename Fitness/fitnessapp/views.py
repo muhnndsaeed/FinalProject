@@ -54,7 +54,9 @@ def list_profile(request : Request):
 
 
 
-
+'''
+To update the profile and confirm of id
+'''
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 def update_profile(request : Request, profile_id):
@@ -73,7 +75,9 @@ def update_profile(request : Request, profile_id):
         return Response({"msg" : "bad request, cannot update"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+'''
+to delete the profile by id 
+'''
 
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
@@ -110,7 +114,9 @@ def add_blog(request: Request):
     return Response("no", status=status.HTTP_400_BAD_REQUEST)
 
 
-
+'''
+to list all blogs
+'''
 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
@@ -125,7 +131,9 @@ def list_blogs(request : Request):
     return Response(dataResponse)
 
 
-
+'''
+to update blog by id 
+'''
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 def update_blog(request : Request, blog_id):
@@ -144,7 +152,9 @@ def update_blog(request : Request, blog_id):
         return Response({"msg" : "bad request, cannot update"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+'''
+to delete the blog 
+'''
 
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
@@ -156,7 +166,10 @@ def delete_blog(request: Request, blog_id):
 
 
 
-
+'''
+to add consultaion 
+If he has the permissions, the consultation will be created
+'''
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
@@ -194,7 +207,9 @@ def list_consultations(request : Request):
     return Response(dataResponse)
 
 
-
+'''
+to update consultation
+'''
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 def update_consultation(request : Request, consultation_id):
@@ -214,7 +229,9 @@ def update_consultation(request : Request, consultation_id):
 
 
 
-
+'''
+To delete consulttion 
+'''
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 def delete_consultation(request: Request, consultation_id):
@@ -329,7 +346,9 @@ def list_concomment(request : Request):
     return Response(dataResponse)
 
 
+'''
 
+'''
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 def update_concomment(request : Request, comment_id):

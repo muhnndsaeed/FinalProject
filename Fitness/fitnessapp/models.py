@@ -15,13 +15,17 @@ class Profile(models.Model):
     experience = models.TextField()
     user = models.ForeignKey(User,on_delete=models.CASCADE)
 
-
+'''
+this class for Blog Confused about the title and description
+'''
 class Blog(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
+'''
+this class for Consultation Confused about the title and description
+'''
 class Consultation(models.Model):
     title = models.CharField(max_length=128)
     description = models.TextField()
